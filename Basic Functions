@@ -1,0 +1,70 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <iomanip>
+#include <map>
+#include "json.hpp"
+
+using json = nlohmann::json;
+using namespace std;
+
+const string database_file = "database.json";
+
+json loadDatabase() {
+    ifstream file(database_file);
+    json data;
+    if (file.is_open()) {
+        file >> data;
+        file.close();
+    }
+    return data;
+}
+
+void saveDatabase(const json& data) {
+    ofstream file(database_file);
+    if (file.is_open()) {
+        file << setw(4) << data << endl;
+        file.close();
+    }
+}
+
+void addUser(const string& username, const string& password) {
+    json data = loadDatabase();
+    data[username] = password;
+    saveDatabase(data);
+    cout << "User '" << username << "' added successfully." << endl;
+}
+
+void editPassword(const string& username, const string& newPassword) {
+    json data = loadDatabase();
+    if (data.find(username) != data.end()) {
+        data[username] = newPassword;
+        saveDatabase(data);
+        cout << "Password for user '" << username << "' updated successfully." << endl;
+    } else {
+        cout << "User '" << username << "' not found." << endl;
+    }
+}
+
+void deleteUser(const string& username) {
+    json data = loadDatabase();
+    if (data.find(username) != data.end()) {
+        data.erase(username);
+        saveDatabase(data);
+        cout << "User '" << username << "' deleted successfully." << endl;
+    } else {
+        cout << "User '" << username << "' not found." << endl;
+    }
+}
+
+int main() {
+    addUser("user1", "password1");
+    addUser("user2", "password2");
+
+    editPassword("user1", "newpassword");
+
+    deleteUser("user2");
+
+    return 0;
+}
+
