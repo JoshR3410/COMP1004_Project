@@ -1,0 +1,54 @@
+#include <iostream>
+#include <string>
+#include <curl/curl.h>
+
+using namespace std;
+
+size_t write_callback(char* ptr, size_t size, size_t nmemb, string* data) {
+    data->append(ptr, size * nmemb);
+    return size * nmemb;
+}
+
+void sendEmail(const string& apiKey, const string& from, const string& to, const string& subject, const string& message) {
+    string url = "https://api.sendgrid.com/v3/mail/send";
+
+    CURL *curl = curl_easy_init();
+    if (curl) {
+        struct curl_slist *headers = NULL;
+        headers = curl_slist_append(headers, ("Authorization: Bearer " + apiKey).c_str());
+        headers = curl_slist_append(headers, "Content-Type: application/json");
+
+        string jsonPayload = "{\"personalizations\":[{\"to\":[{\"email\":\"" + to + "\"}]}],\"from\":{\"email\":\"" + from + "\"},\"subject\":\"" + subject + "\",\"content\":[{\"type\":\"text/plain\",\"value\":\"" + message + "\"}]}";
+
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        curl_easy_setopt(curl, CURLOPT_POST, 1);
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonPayload.c_str());
+
+        string response;
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+
+        CURLcode res = curl_easy_perform(curl);
+        if (res != CURLE_OK) {
+            cerr << "Error sending email: " << curl_easy_strerror(res) << endl;
+        } else {
+            cout << "Email sent successfully." << endl;
+        }
+
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(curl);
+    }
+}
+
+int main() {
+    string apiKey = "YOUR_SENDGRID_API_KEY";
+    string from = "your.email@example.com";
+    string to = "recipient@example.com";
+    string subject = "Verification Code";
+    string message = "Your verification code is: 123456";
+
+    sendEmail(apiKey, from, to, subject, message);
+
+    return 0;
+}
