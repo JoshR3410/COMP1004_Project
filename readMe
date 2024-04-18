@@ -1,0 +1,4 @@
+# Welcome to the repository for Vaultico the password management system
+# This application allows a user to add, edit and delete passwords from a JSON file
+# If finished, this application will be able to directly interface with web browsers like google Chrome and be able to auto fill
+# a users details into the relevant fields
