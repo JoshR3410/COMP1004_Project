@@ -1,0 +1,36 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include "json.hpp"
+
+using json = nlohmann::json;
+using namespace std;
+
+const string database_file = "database.json";
+const string autofill_file = "autofill.csv";
+
+void exportAutofillFile(const json& data) {
+    ofstream file(autofill_file);
+    if (file.is_open()) {
+        file << "URL,Username,Password\n";
+        for (auto it = data.begin(); it != data.end(); ++it) {
+            file << "\"https://example.com\"," << it.key() << "," << it.value() << "\n";
+            // Replace "https://example.com" with the actual URL of the website
+        }
+        file.close();
+        cout << "Autofill file exported successfully." << endl;
+    } else {
+        cerr << "Unable to open autofill file for writing." << endl;
+    }
+}
+
+int main() {
+    // Assume you have some users in your database
+    json data;
+    data["user1"] = "password1";
+    data["user2"] = "password2";
+
+    exportAutofillFile(data);
+
+    return 0;
+}
