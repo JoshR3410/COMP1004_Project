@@ -1,0 +1,4 @@
+# This is a password management application created for educational purposes, otherwise known as Vaultico
+# It allows the user to add, edit and delete usernames and passwords at their discretion
+# Vaultico also allows you to auto-fill passwords when using google chrome.
+# There will be multiple files, with each name showing what is in each file
